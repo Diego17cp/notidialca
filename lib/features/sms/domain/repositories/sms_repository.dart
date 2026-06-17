@@ -1,0 +1,12 @@
+import 'package:notidialca/core/failures/result.dart';
+import 'package:notidialca/features/sms/domain/entities/sms_message_entity.dart';
+
+abstract class SmsRepository {
+  Stream<List<SmsMessageEntity>> watchAllMessages();
+  Stream<List<SmsMessageEntity>> watchMessagesByPhoneNumber(String phoneNumber);
+  Stream<int> watchUnreadCount();
+  Future<Result<void>> insertMessage(SmsMessageEntity message);
+  Future<Result<void>> upsertMessage(SmsMessageEntity message);
+  Future<Result<void>> markAsRead(String messageId);
+  Future<Result<SmsMessageEntity>> findById(String id);
+}
