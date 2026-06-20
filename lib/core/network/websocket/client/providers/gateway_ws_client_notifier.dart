@@ -1,0 +1,118 @@
+import 'package:notidialca/core/database/drift/tables/call_logs_table.dart';
+import 'package:notidialca/core/network/websocket/client/gateway_ws_client.dart';
+import 'package:notidialca/core/network/websocket/client/ws_connection_state.dart';
+import 'package:notidialca/core/network/websocket/messages/payloads/ws_payloads.dart';
+import 'package:notidialca/features/calls/domain/entities/call_log_entity.dart';
+import 'package:notidialca/features/calls/presentation/providers/call_providers.dart';
+import 'package:notidialca/features/sms/domain/entities/sms_message_entity.dart';
+import 'package:notidialca/features/sms/presentation/providers/sms_providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'gateway_ws_client_notifier.g.dart';
+
+@riverpod
+class GatewayWsClientNotifier extends _$GatewayWsClientNotifier {
+  GatewayWsClient? _client;
+
+  @override
+  WsConnectionState build() {
+    ref.onDispose(() {
+      _client?.disconnect();
+    });
+    return const WsDisconnected();
+  }
+
+  void connect({
+    required String ip,
+    required int port,
+    required String clientDeviceId,
+  }) {
+    _client?.disconnect();
+    _client = GatewayWsClient.forSession(
+      ip: ip,
+      port: port,
+      clientDeviceId: clientDeviceId,
+    );
+
+    _client!.connectionState.listen((wsState) {
+      state = wsState;
+    });
+
+    _client!.incomingEvents.listen(_dispatchEvent);
+    _client!.connect();
+  }
+
+  Future<void> disconnect() async {
+    await _client?.disconnect();
+    _client = null;
+    state = const WsDisconnected();
+  }
+
+  Future<void> _dispatchEvent(WsIncomingEvent event) async {
+    switch (event) {
+      case WsSmsEvent(payload: final payload):
+        await _applySms(payload);
+      case WsCallIncomingEvent(payload: final payload):
+        await _applyCallIncoming(payload);
+      case WsCallEndedEvent(payload: final payload):
+        await _applyCallEnded(payload);
+      case WsSyncResponseEvent(payload: final payload):
+        await _applySyncResponse(payload);
+    }
+  }
+
+  Future<void> _applySms(WsSmsReceivedPayload payload) async {
+    final useCase = ref.read(applySyncedSmsUseCaseProvider);
+    final entity = SmsMessageEntity(
+      id: payload.id,
+      phoneNumber: payload.phoneNumber,
+      content: payload.content,
+      receivedAt: payload.receivedAt,
+      sourceDeviceId: payload.sourceDeviceId,
+      isRead: false,
+      contactName: payload.contactName,
+    );
+    await useCase.call(entity);
+  }
+
+  Future<void> _applyCallIncoming(WsCallIncomingPayload payload) async {
+    final useCase = ref.read(applySyncedCallUseCaseProvider);
+    final entity = CallLogEntity(
+      id: payload.id,
+      phoneNumber: payload.phoneNumber,
+      callType: CallType.incoming,
+      sourceDeviceId: payload.sourceDeviceId,
+      contactName: payload.contactName,
+      startedAt: payload.startedAt,
+      endedAt: null,
+    );
+    await useCase.call(entity);
+  }
+
+  Future<void> _applyCallEnded(WsCallEndedPayload payload) async {
+    final useCase = ref.read(applySyncedCallUseCaseProvider);
+    final entity = CallLogEntity(
+      id: payload.id,
+      phoneNumber: payload.phoneNumber,
+      callType: CallType.incoming,
+      sourceDeviceId: payload.sourceDeviceId,
+      contactName: null,
+      startedAt: null,
+      endedAt: payload.endedAt,
+    );
+    await useCase.call(entity);
+  }
+
+  Future<void> _applySyncResponse(WsSyncResponsePayload payload) async {
+    for (final event in payload.events) {
+      if (event.sms != null) {
+        await _applySms(event.sms!);
+      } else if (event.callIncoming != null) {
+        await _applyCallIncoming(event.callIncoming!);
+      } else if (event.callEnded != null) {
+        await _applyCallEnded(event.callEnded!);
+      }
+      _client?.sendSyncAck(event.eventId);
+    }
+  }
+}
