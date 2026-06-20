@@ -12,12 +12,14 @@ class WsCallIncomingPayload extends WsPayload {
     required this.id,
     required this.phoneNumber,
     required this.startedAt,
+    required this.sourceDeviceId,
     this.contactName,
   });
 
   final String id;
   final String phoneNumber;
   final String? contactName;
+  final String sourceDeviceId;
   @EpochMillisConverter()
   final DateTime startedAt;
 

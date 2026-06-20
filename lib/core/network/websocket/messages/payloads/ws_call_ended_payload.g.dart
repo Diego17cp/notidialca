@@ -12,10 +12,14 @@ WsCallEndedPayload _$WsCallEndedPayloadFromJson(Map<String, dynamic> json) =>
       endedAt: const EpochMillisConverter().fromJson(
         (json['endedAt'] as num).toInt(),
       ),
+      sourceDeviceId: json['sourceDeviceId'] as String,
+      phoneNumber: json['phoneNumber'] as String,
     );
 
 Map<String, dynamic> _$WsCallEndedPayloadToJson(WsCallEndedPayload instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'sourceDeviceId': instance.sourceDeviceId,
+      'phoneNumber': instance.phoneNumber,
       'endedAt': const EpochMillisConverter().toJson(instance.endedAt),
     };

@@ -11,9 +11,13 @@ class WsCallEndedPayload extends WsPayload {
   const WsCallEndedPayload({
     required this.id,
     required this.endedAt,
+    required this.sourceDeviceId,
+    required this.phoneNumber,
   });
 
   final String id;
+  final String sourceDeviceId;
+  final String phoneNumber;
 
   @EpochMillisConverter()
   final DateTime endedAt;

@@ -14,6 +14,7 @@ WsCallIncomingPayload _$WsCallIncomingPayloadFromJson(
   startedAt: const EpochMillisConverter().fromJson(
     (json['startedAt'] as num).toInt(),
   ),
+  sourceDeviceId: json['sourceDeviceId'] as String,
   contactName: json['contactName'] as String?,
 );
 
@@ -23,5 +24,6 @@ Map<String, dynamic> _$WsCallIncomingPayloadToJson(
   'id': instance.id,
   'phoneNumber': instance.phoneNumber,
   'contactName': instance.contactName,
+  'sourceDeviceId': instance.sourceDeviceId,
   'startedAt': const EpochMillisConverter().toJson(instance.startedAt),
 };

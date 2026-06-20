@@ -12,6 +12,7 @@ class WsSmsReceivedPayload extends WsPayload {
     required this.id,
     required this.phoneNumber,
     required this.receivedAt,
+    required this.sourceDeviceId,
     this.contactName,
     this.content = '',
   });
@@ -20,6 +21,7 @@ class WsSmsReceivedPayload extends WsPayload {
   final String phoneNumber;
   final String? contactName;
   final String content;
+  final String sourceDeviceId;
 
   @EpochMillisConverter()
   final DateTime receivedAt;

@@ -14,6 +14,7 @@ WsSmsReceivedPayload _$WsSmsReceivedPayloadFromJson(
   receivedAt: const EpochMillisConverter().fromJson(
     (json['receivedAt'] as num).toInt(),
   ),
+  sourceDeviceId: json['sourceDeviceId'] as String,
   contactName: json['contactName'] as String?,
   content: json['content'] as String? ?? '',
 );
@@ -25,5 +26,6 @@ Map<String, dynamic> _$WsSmsReceivedPayloadToJson(
   'phoneNumber': instance.phoneNumber,
   'contactName': instance.contactName,
   'content': instance.content,
+  'sourceDeviceId': instance.sourceDeviceId,
   'receivedAt': const EpochMillisConverter().toJson(instance.receivedAt),
 };

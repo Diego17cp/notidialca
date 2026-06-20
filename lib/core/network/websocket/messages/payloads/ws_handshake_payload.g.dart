@@ -8,7 +8,7 @@ part of 'ws_handshake_payload.dart';
 
 WsHandshakePayload _$WsHandshakePayloadFromJson(Map<String, dynamic> json) =>
     WsHandshakePayload(
-      pairingToken: json['pairingToken'] as String,
+      pairingToken: json['pairingToken'] as String?,
       clientDeviceId: json['clientDeviceId'] as String,
     );
 
