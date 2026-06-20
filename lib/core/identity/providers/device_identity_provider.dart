@@ -19,6 +19,7 @@ Future<DeviceIdentityStorage> deviceIdentityStorage(Ref ref) async {
   final secure = ref.watch(flutterSecureStorageProvider);
   return DeviceIdentityStorage(prefs, secure);
 }
+
 @riverpod
 Future<DeviceIdentityService> deviceIdentityService(Ref ref) async {
   final storage = await ref.watch(deviceIdentityStorageProvider.future);
@@ -26,9 +27,16 @@ Future<DeviceIdentityService> deviceIdentityService(Ref ref) async {
   final database = ref.watch(appDatabaseProvider);
   return DeviceIdentityService(storage, deviceInfo, database);
 }
+
 @riverpod
 Stream<DeviceRole?> localDeviceRole(Ref ref) async* {
   final service = await ref.watch(deviceIdentityServiceProvider.future);
   final identity = await service.readIdentity();
   yield identity?.role;
+}
+
+@riverpod
+Future<LocalDeviceIdentity?> localDeviceIdentity(Ref ref) async {
+  final service = await ref.watch(deviceIdentityServiceProvider.future);
+  return service.readIdentity();
 }
