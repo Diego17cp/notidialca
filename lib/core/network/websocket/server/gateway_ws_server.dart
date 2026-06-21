@@ -24,6 +24,7 @@ class GatewayWsServer {
     required this.onHandshakeRequest,
     required this.onSyncRequested,
     required this.onSyncAckReceived,
+    this.onClientDisconnected,
     Duration pingInterval = const Duration(seconds: 20),
     Duration heartbeatTimeout = const Duration(seconds: 60),
     Logger? logger,
@@ -40,6 +41,7 @@ class GatewayWsServer {
   onHandshakeRequest;
   final Future<List<WsSyncEventDto>> Function() onSyncRequested;
   final Future<void> Function(String eventId) onSyncAckReceived;
+  final void Function()? onClientDisconnected;
 
   HttpServer? _httpServer;
   WsClientSession? _connectedClient;
@@ -116,6 +118,7 @@ class GatewayWsServer {
     if (_connectedClient == session) {
       _connectedClient = null;
       _logger.i('GatewayWsServer: Client disconnected');
+      onClientDisconnected?.call();
     }
   }
 
@@ -233,6 +236,7 @@ class GatewayWsServer {
         );
         client.close(1001, 'Heartbeat timeout');
         _connectedClient = null;
+        onClientDisconnected?.call();
         return;
       }
       if (client.isHandshakeComplete) {
