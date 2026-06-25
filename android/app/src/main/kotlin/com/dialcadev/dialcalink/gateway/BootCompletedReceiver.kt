@@ -6,8 +6,6 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 
 class BootCompletedReceiver : BroadcastReceiver() {
     companion object {

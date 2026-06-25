@@ -3,7 +3,8 @@ package com.dialcadev.dialcalink
 import android.content.Intent
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.dialcadev.notidialca.gateway.GatewayForegroundService
+import com.dialcadev.dialcalink.gateway.GatewayForegroundService
+import com.dialcadev.dialcalink.gateway.GatewayUiBridgeChannel
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -56,8 +57,8 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun startGatewayService() {
-        val serviceIntent = Intent(this, GatewayForegroundService:class.java)
-        iif (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val serviceIntent = Intent(this, GatewayForegroundService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ContextCompat.startForegroundService(this, serviceIntent)
         } else {
             startService(serviceIntent)
@@ -70,7 +71,7 @@ class MainActivity : FlutterActivity() {
     }
 
     @Suppress("DEPRECATION")
-    private fun isServiceRunning(): Boolean {
+    private fun isGatewayServiceRunning(): Boolean {
         val manager = getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager
         return manager.getRunningServices(Integer.MAX_VALUE).any {
             it.service.className == GatewayForegroundService::class.java.name

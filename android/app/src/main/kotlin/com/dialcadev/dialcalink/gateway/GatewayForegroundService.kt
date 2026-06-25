@@ -40,7 +40,7 @@ class GatewayForegroundService : Service() {
             if (intent?.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
             val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
             for (message in messages) {
-                val sender = message.displayOriginatingAdress ?: continue
+                val sender = message.displayOriginatingAddress ?: continue
                 val content = message.displayMessageBody ?: ""
                 emitEvent(
                     mapOf(
