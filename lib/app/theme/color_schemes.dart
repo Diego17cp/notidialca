@@ -20,6 +20,8 @@ const lightColorScheme = ColorScheme(
   surface: AppColors.lightSurface,
   onSurface: AppColors.textPrimaryLight,
 
+  surfaceContainerHighest: AppColors.lightSurfaceVariant,
+
   error: AppColors.error,
   onError: Colors.white,
 
@@ -67,6 +69,8 @@ const darkColorScheme = ColorScheme(
   // Surfaces
   surface: AppColors.darkSurface,
   onSurface: AppColors.textPrimaryDark,
+
+  surfaceContainerHighest: AppColors.darkSurfaceVariant,
 
   error: AppColors.error,
   onError: Colors.white,
