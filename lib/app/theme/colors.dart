@@ -6,6 +6,9 @@ abstract final class AppColors {
   static const Color brandBlue = Color(0xFF085691);
   static const Color brandMustard = Color(0xFFD79B5F);
 
+  static const Color brandBlueLight = Color(0xFF3A8FD1);
+  static const Color brandMustardLight = Color(0xFFF6E7D4);
+
   // ========== Light Theme Colors ==========
 
   static const Color lightBackground = Color(0xFFF8FAFC);

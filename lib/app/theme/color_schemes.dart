@@ -19,6 +19,7 @@ const lightColorScheme = ColorScheme(
   // Surfaces
   surface: AppColors.lightSurface,
   onSurface: AppColors.textPrimaryLight,
+  onSurfaceVariant: AppColors.textSecondaryLight,
 
   surfaceContainerHighest: AppColors.lightSurfaceVariant,
 
@@ -69,6 +70,7 @@ const darkColorScheme = ColorScheme(
   // Surfaces
   surface: AppColors.darkSurface,
   onSurface: AppColors.textPrimaryDark,
+  onSurfaceVariant: AppColors.textSecondaryDark,
 
   surfaceContainerHighest: AppColors.darkSurfaceVariant,
 
