@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 enum AppPermission {
@@ -50,6 +52,23 @@ enum AppPermission {
   final String title;
   final String description;
   final Set<AppRole> rolesRequired;
+
+  IconData get icon {
+    switch (this) {
+      case AppPermission.receiveSms:
+        return CupertinoIcons.chat_bubble_text_fill;
+      case AppPermission.readPhoneState:
+        return CupertinoIcons.phone_fill;
+      case AppPermission.contacts:
+        return Icons.contacts_sharp;
+      case AppPermission.location:
+        return CupertinoIcons.wifi;
+      case AppPermission.camera:
+        return CupertinoIcons.qrcode;
+      case AppPermission.notifications:
+        return CupertinoIcons.bell_fill;
+    }
+  }
 }
 
 enum AppRole {
