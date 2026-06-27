@@ -130,10 +130,13 @@ class GatewayForegroundService : Service() {
         }
     }
     private fun startForegroundWithNotification() {
+        val iconResId = resources.getIdentifier("ic_notification_gateway", "drawable", packageName)
+        Log.i(TAG, "startForegroundWithNotification: iconResId=$iconResId")
+        val smallIcon = if (iconResId != 0) iconResId else android.R.drawable.ic_dialog_info
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Dialca Link")
             .setContentText("Actuando como Gateway — sincronizando SMS y llamadas")
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // TODO: icono propio de la app
+            .setSmallIcon(smallIcon)
             .setOngoing(true)
             .build()
 
