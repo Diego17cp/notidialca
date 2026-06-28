@@ -71,7 +71,7 @@ class CallsDao extends DatabaseAccessor<AppDatabase> with _$CallsDaoMixin {
     final query = select(callLogs)
       ..where((t) =>
           t.startedAt.isBiggerOrEqualValue(date) &
-          t.id.equals(id));
+          t.sourceDeviceId.equals(id));
     return query.get().then((rows) => rows.length);
   }
 }

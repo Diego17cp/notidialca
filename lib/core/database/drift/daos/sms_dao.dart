@@ -65,7 +65,7 @@ class SmsDao extends DatabaseAccessor<AppDatabase> with _$SmsDaoMixin {
     final query = select(smsMessages)
       ..where((t) =>
           t.receivedAt.isBiggerOrEqualValue(date) &
-          t.id.equals(id));
+          t.sourceDeviceId.equals(id));
     return query.get().then((rows) => rows.length);
   }
 }
