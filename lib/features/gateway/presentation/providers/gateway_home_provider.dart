@@ -1,5 +1,9 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notidialca/core/identity/providers/device_identity_provider.dart';
 import 'package:notidialca/core/platform/gateway/providers/gateway_native_bridge_provider.dart';
 import 'package:notidialca/core/platform/gateway/providers/gateway_ui_bridge_provider.dart';
+import 'package:notidialca/features/calls/presentation/providers/call_providers.dart';
+import 'package:notidialca/features/sms/presentation/providers/sms_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'gateway_home_provider.g.dart';
@@ -10,22 +14,26 @@ class GatewayHomeState {
   final GatewayServiceStatus serviceStatus;
   final bool isClientConnected;
   final String? clientDeviceId;
+  final DateTime? serviceStartedAt;
 
   GatewayHomeState({
     required this.serviceStatus,
     required this.isClientConnected,
     this.clientDeviceId,
+    this.serviceStartedAt,
   });
 
   GatewayHomeState copyWith({
     GatewayServiceStatus? serviceStatus,
     bool? isClientConnected,
     String? clientDeviceId,
+    DateTime? serviceStartedAt,
   }) {
     return GatewayHomeState(
       serviceStatus: serviceStatus ?? this.serviceStatus,
       isClientConnected: isClientConnected ?? this.isClientConnected,
       clientDeviceId: clientDeviceId ?? this.clientDeviceId,
+      serviceStartedAt: serviceStartedAt ?? this.serviceStartedAt,
     );
   }
 }
@@ -56,10 +64,13 @@ class GatewayHomeNotifier extends _$GatewayHomeNotifier {
   Future<void> _checkServiceStatus() async {
     final nativeBridge = ref.read(gatewayNativeBridgeProvider);
     final isRunning = await nativeBridge.isServiceRunning();
+    final identityService = await ref.read(deviceIdentityServiceProvider.future);
+    final startedAt = await identityService.readServiceStartedAtAsync();
     state = state.copyWith(
       serviceStatus: isRunning
           ? GatewayServiceStatus.on
           : GatewayServiceStatus.off,
+      serviceStartedAt: isRunning ? startedAt : null,
     );
   }
 
@@ -72,11 +83,54 @@ class GatewayHomeNotifier extends _$GatewayHomeNotifier {
         serviceStatus: GatewayServiceStatus.off,
         isClientConnected: false,
         clientDeviceId: null,
+        serviceStartedAt: null,
       );
     } else {
       state = state.copyWith(serviceStatus: GatewayServiceStatus.starting);
+      final nativeBridge = ref.read(gatewayNativeBridgeProvider);
       await nativeBridge.startService();
-      state = state.copyWith(serviceStatus: GatewayServiceStatus.on);
+      await Future.delayed(const Duration(milliseconds: 500));
+      await _checkServiceStatus();
     }
+  }
+}
+
+@riverpod
+Future<int> messagesTodayCount(Ref ref) async {
+  final identity = await ref.watch(localDeviceIdentityProvider.future);
+  if (identity == null) return 0;
+  
+  final repository = ref.watch(smsRepositoryProvider);
+  final now = DateTime.now();
+  final startOfDay = DateTime(now.year, now.month, now.day);
+  
+  return repository.countByDateAndId(startOfDay, identity.id);
+}
+
+@riverpod
+Future<int> callsTodayCount(Ref ref) async {
+  final identity = await ref.watch(localDeviceIdentityProvider.future);
+  if (identity == null) return 0;
+  
+  final repository = ref.watch(callRepositoryProvider);
+  final now = DateTime.now();
+  final startOfDay = DateTime(now.year, now.month, now.day);
+  
+  return repository.countByDateAndId(startOfDay, identity.id);
+}
+
+@riverpod
+Stream<Duration?> gatewayUptime(Ref ref) async* {
+  final state = ref.watch(gatewayHomeNotifierProvider);
+  final startedAt = state.serviceStartedAt;
+  
+  if (startedAt == null || state.serviceStatus != GatewayServiceStatus.on) {
+    yield null;
+    return;
+  }
+
+  while (true) {
+    yield DateTime.now().difference(startedAt);
+    await Future.delayed(const Duration(seconds: 1));
   }
 }
