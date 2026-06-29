@@ -8,6 +8,7 @@ import com.dialcadev.dialcalink.gateway.GatewayUiBridgeChannel
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.EventChannel
 
 class MainActivity : FlutterActivity() {
     companion object {
@@ -54,6 +55,15 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, GatewayUiBridgeChannel.EVENT_CHANNEL)
+            .setStreamHandler(object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, sink: EventChannel.EventSink?) {
+                    GatewayUiBridgeChannel.uiEventSink = sink
+                }
+                override fun onCancel(arguments: Any?) {
+                    GatewayUiBridgeChannel.uiEventSink = null
+                }
+            })
     }
 
     private fun startGatewayService() {
