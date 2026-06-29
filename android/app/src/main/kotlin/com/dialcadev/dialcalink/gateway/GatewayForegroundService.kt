@@ -203,7 +203,7 @@ class GatewayForegroundService : Service() {
                     "emitConnectionUpdate" -> {
                         val isConnected = call.argument<Boolean>("isConnected") ?: false
                         val clientDeviceId = call.argument<String>("clientDeviceId")
-                        uiBridgeEventSink?.success(mapOf(
+                        GatewayUiBridgeChannel.uiEventSink?.success(mapOf(
                             "type" to "client_connection_changed",
                             "isConnected" to isConnected,
                             "clientDeviceId" to clientDeviceId
