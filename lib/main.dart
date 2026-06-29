@@ -1,3 +1,4 @@
+export 'package:notidialca/gateway_entrypoint/main_gateway_service.dart' show gatewayServiceEntrypoint;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notidialca/app/app.dart';
